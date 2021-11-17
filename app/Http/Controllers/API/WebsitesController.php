@@ -15,7 +15,7 @@ class WebsitesController extends Controller
 {
     public function getAllWebsites()
     {
-        return response()->json(Website::all(), 200);
+        return response()->json(Website::withCount('subscription')->get(), 200);
     }
 
     public function createPost(Request $request)
