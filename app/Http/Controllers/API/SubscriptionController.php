@@ -14,7 +14,7 @@ class SubscriptionController extends Controller
     public function subscribe(Request $request)
     {
         $validator = Validator::make($request->all(),[
-            'email' => 'required|unique:users|email|between:3,100',
+            'email' => 'required|email|between:3,100',
             'name' => 'required|max:255|',
             'website_id' => 'required|exists:websites,id',
         ]);
@@ -26,16 +26,17 @@ class SubscriptionController extends Controller
             ], 400);
         }
         
+        
         DB::beginTransaction();
             $user = User::firstOrCreate(
                 ['email' => $request->email],
                 ['name' => $request->name,]
             );
 
-            Subscription::create([
-                'user_id' => $user->id,
-                'website_id' => $request->website_id
-            ]);
+            Subscription::firstOrCreate(
+                ['user_id' => $user->id, 'website_id' => $request->website_id],
+                ['website_id' => $request->website_id]
+            );
         DB::commit();
 
         return response()->json(['msg' => 'Success'], 200);
